@@ -129,3 +129,69 @@ router.post('/login',  (req, res) => {
         });
     });  
 });
+
+// POST /api/users/logout -- log out an existing user
+router.post('/logout', withAuth, (req, res) => {
+  if (req.session.loggedIn) {
+    req.session.destroy(() => {
+      // 204 status is that a request has succeeded, but client does not need to go to a different page
+        // (200 indicates success and that a newly updated page should be loaded, 201 is for a resource being created)
+      res.status(204).end();
+    });
+  } else {
+    // if there is no session, then the logout request will send back a no resource found status
+    res.status(404).end();
+  }
+})
+
+// PUT /api/users/1 -- update an existing user
+router.put('/:id', withAuth, (req, res) => {
+    // update method
+    // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
+  
+    // if req.body has exact key/value pairs to match the model, 
+    // you can just use `req.body` instead of calling out each property,
+    // allowing for updating only key/value pairs that are passed through
+    User.update(req.body, {
+        // since there is a hook to hash only the password, the option is noted here
+        individualHooks: true,
+        // use the id as the parameter for the individual user to be updated
+        where: {
+            id: req.params.id
+        }
+    })
+      .then(dbUserData => {
+        if (!dbUserData[0]) {
+          res.status(404).json({ message: 'No user found with this id' });
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  })
+
+// DELETE /api/users/1 -- delete an existing user
+router.delete('/:id', withAuth, (req, res) => {
+    // destroy method
+    User.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then(dbUserData => {
+        if (!dbUserData) {
+          res.status(404).json({ message: 'No user found with this id' });
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  });
+
+module.exports = router;

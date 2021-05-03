@@ -1,5 +1,5 @@
 {
-  "name": "mvc-tech-blog",
+  "name": "mvc-tech-blog13",
   "version": "1.0.0",
   "description": "This project uses the Model-View-Controller (MVC) paradigm to create a blog-style website where developers can post articles with commentary, edit posts, and comment on other user's articles.",
   "main": "server.js",
